@@ -259,7 +259,7 @@ class Example(QWidget):
         self.main_image.img = self.edit_pix
         self.main_image.setPixmap(self.edit_pix)
 
-    def drawObjects(self, semLabel):
+    def drawObjects(self, semLabel, objId=-1):
 
         clr = cm.rainbow(np.linspace(0, 1, len(self.floorMap.classes)))
         self.drawn_map = self.highlight_map.copy()
@@ -271,7 +271,10 @@ class Example(QWidget):
                     if (obj.semLabel == semLabel) or (semLabel == allDrawInd):
                         color = 255 * clr[obj.semLabel, :3]
                         x1, y1, x2, y2 = obj.position
-                        cv2.rectangle(self.drawn_map, (x1, y1), (x2, y2), color, 1)
+                        if objId == obj.id:
+                            cv2.rectangle(self.drawn_map, (x1, y1), (x2, y2), color, -1)
+                        else:
+                            cv2.rectangle(self.drawn_map, (x1, y1), (x2, y2), color, 1)
 
         image = QImage(self.drawn_map, self.drawn_map.shape[1], self.drawn_map.shape[0], self.drawn_map.shape[1] * 3, QImage.Format_RGB888)
         self.edit_pix = QPixmap(image)
@@ -289,8 +292,14 @@ class Example(QWidget):
 
         self.main_image.img = self.orig_pix
         self.main_image.setPixmap(self.orig_pix)
+
+        objID = -1
+        if len(self.floorMap.rooms[self.currentRoom].objects):           
+            obj = self.floorMap.rooms[self.currentRoom].objects[self.currentObjInd]
+            objID = obj.id
+
         self.highlightSelectedRoom()
-        self.drawObjects(self.semMapID)
+        self.drawObjects(self.semMapID, objID)
 
     def setRoomName(self):
 
@@ -310,14 +319,17 @@ class Example(QWidget):
             obj = self.floorMap.rooms[self.currentRoom].objects[o]
             self.list_objects.addItem(str(obj.id))
 
+        objID = -1
         if len(self.floorMap.rooms[self.currentRoom].objects):
             self.currentObjInd = 0
             self.list_objects.setCurrentRow(self.currentObjInd)
             obj = self.floorMap.rooms[self.currentRoom].objects[self.currentObjInd]
             self.cb2.setCurrentIndex(obj.semLabel)
+            objID = obj.id
+
 
         self.highlightSelectedRoom()
-        self.drawObjects(self.semMapID)
+        self.drawObjects(self.semMapID, objID)
 
     def semclassselectionchange(self, i):
 
@@ -418,7 +430,8 @@ class Example(QWidget):
                 elif text == "None":
                     self.semMapID = len(self.floorMap.classes) + 1
 
-            self.drawObjects(self.semMapID)
+            obj = self.floorMap.rooms[self.currentRoom].objects[self.currentObjInd]
+            self.drawObjects(self.semMapID, obj.id)
 
 
     def object_clicked(self, item):
@@ -426,6 +439,7 @@ class Example(QWidget):
         self.currentObjInd = self.list_objects.selectedIndexes()[0].row()
         obj = self.floorMap.rooms[self.currentRoom].objects[self.currentObjInd]
         self.cb2.setCurrentIndex(obj.semLabel)
+        self.drawObjects(self.semMapID , obj.id)
 
     # def paintEvent( self, event) :
     #     pass
