@@ -343,8 +343,15 @@ class Example(QWidget):
         w.setWindowTitle("Select Picture")
         filename = QFileDialog.getOpenFileName(w, 'Open File', '/')
         self.map_name = filename[0]
-        self.main_image.setPixmap(QPixmap(self.map_name))
-        self.main_image.img = QPixmap(self.map_name)
+
+        self.orig_map = cv2.imread(self.map_name)
+        image = QImage(self.orig_map, self.orig_map.shape[1], self.orig_map.shape[0], self.orig_map.shape[1] * 3, QImage.Format_RGB888)
+        self.orig_pix = QPixmap(image)
+        self.edit_pix = QPixmap(image)
+
+        self.main_image.img = self.orig_pix
+        self.main_image.setPixmap(self.orig_pix)
+   
         self.data_folder = os.path.split(os.path.abspath(self.map_name))[0] + "/"
         self.floorMap = FloorMap(self.data_folder + "floor.config")
         h, w, c = self.floorMap.map.shape
@@ -354,6 +361,10 @@ class Example(QWidget):
             self.currentRoom = 0
             self.room_name_edit.setText(self.floorMap.rooms[self.currentRoom].name)
             self.room_purpose_edit.setText(self.floorMap.rooms[self.currentRoom].purpose)
+            self.cb.clear()
+            for r in range(len(self.floorMap.rooms)):
+                self.cb.addItem(str(r))
+
             self.list_objects.clear()
             for o in range(len(self.floorMap.rooms[self.currentRoom].objects)):
                 obj = self.floorMap.rooms[self.currentRoom].objects[o]
@@ -377,21 +388,26 @@ class Example(QWidget):
 
     def addobject(self):
 
-        obj = self.floorMap.rooms[self.currentRoom].CreateObject()
-        self.floorMap.rooms[self.currentRoom].objects.append(obj)
+        self.floorMap.rooms[self.currentRoom].AddObject()
         objs = self.floorMap.rooms[self.currentRoom].objects
+
+        #self.floorMap.rooms[self.currentRoom].objects.append(obj)
+        #objs = self.floorMap.rooms[self.currentRoom].objects
         self.currentObjInd = len(objs) - 1
+        obj = objs[self.currentObjInd]
         self.list_objects.addItem(str(obj.id))
         self.cb2.setCurrentIndex(obj.semLabel)
         self.list_objects.setCurrentRow(self.currentObjInd)
 
     def removeobject(self):
 
-        self.floorMap.rooms[self.currentRoom].objects.pop(self.currentObjInd)
+        self.floorMap.rooms[self.currentRoom].RemoveObject(self.currentObjInd)
+        #self.floorMap.rooms[self.currentRoom].objects.pop(self.currentObjInd)
         self.list_objects.takeItem(self.currentObjInd)
 
         objs = self.floorMap.rooms[self.currentRoom].objects
         self.currentObjInd = len(objs) - 1
+        obj = objs[self.currentObjInd]
         self.cb2.setCurrentIndex(obj.semLabel)
         self.list_objects.setCurrentRow(self.currentObjInd)
 

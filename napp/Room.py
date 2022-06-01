@@ -34,6 +34,29 @@ class Room():
 		obj = SObject(objCfg)
 		return obj
 
+	def AddObject(self, semLabel=0, position=[0, 0, 0, 0]):
+
+		oid = random.randint(0, 200)
+		while oid in self.ids:
+			oid = random.randint(0, 200)
+
+		objCfg = {
+		  "semLabel": semLabel,
+		  "position": position,
+		  "id": oid
+		}
+
+		obj = SObject(objCfg)
+
+		self.objects.append(obj)
+		self.ids.append(obj.id)
+
+	def RemoveObject(self, id):
+		self.objects.pop(id)
+		self.ids.pop(id)
+
+
+
 	def Dump(self):
 
 		objCfgs = []
