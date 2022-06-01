@@ -4,19 +4,23 @@ from PyQt5.QtWidgets import *
 import sys, os
 from FloorMap import FloorMap
 from SObject import SObject
+import numpy as np 
+import cv2
+from matplotlib import cm
 
-class myQLabel(QLabel):
-    def __init__(self,parent=None):
-        super(myQLabel, self).__init__(parent)
+class EditableMap(QLabel):
+    def __init__(self, parent=None):
+        super(EditableMap, self).__init__(parent)
         self.edit = False
+        self.parent = parent
 
         self.begin, self.destination, self.pin = QPoint(), QPoint(), QPoint()   
 
     def paintEvent(self, QPaintEvent):
-        super(myQLabel, self).paintEvent(QPaintEvent)
+        super(EditableMap, self).paintEvent(QPaintEvent)
         painter = QPainter(self)
         painter.drawPixmap(self.rect(), self.img)
-        painter.setPen(QPen(Qt.red))
+        painter.setPen(QPen(Qt.gray))
         rect = QRect(self.begin, self.destination)
         painter.drawRect(rect.normalized())
 
@@ -40,11 +44,26 @@ class myQLabel(QLabel):
     def mouseReleaseEvent(self, event):
         if event.button() & Qt.LeftButton & self.edit:
             painter = QPainter(self.img)
-            painter.setPen(QPen(Qt.red))
+            painter.setPen(QPen(Qt.gray))
             rect = QRect(self.begin, self.destination)
             painter.drawRect(rect.normalized())
 
-            print(self.begin.x(), self.begin.y(), self.destination.x(), self.destination.y())
+            pos = [self.begin.x(), self.begin.y(), self.destination.x(), self.destination.y()]
+            uvs = [[self.begin.y(), self.begin.x()], [self.destination.y(), self.destination.x()]]
+
+            currentRoom = self.parent.currentRoom
+            currentObjInd = self.parent.currentObjInd
+            updateObj = True
+
+            for uv in uvs:
+                val = self.parent.floorMap.roomSeg[uv[0], uv[1]]
+                if val != currentRoom + 1:
+                    updateObj = False
+
+            if updateObj:
+                self.parent.floorMap.rooms[currentRoom].objects[currentObjInd].position = pos
+            else:
+                print("Object not in selected room!")
 
             self.begin, self.destination = QPoint(), QPoint()
             self.update()
@@ -74,13 +93,24 @@ class Example(QWidget):
         self.currentObjLabel = 0
         self.currentObjInd = -1
 
+
         # the map visualization
-        self.main_image = myQLabel(self)
-        self.main_image.img = QPixmap(self.map_name)
-        self.main_image.setPixmap(QPixmap(self.map_name))
+        self.orig_map = cv2.imread(self.map_name)
+        image = QImage(self.orig_map, self.orig_map.shape[1], self.orig_map.shape[0], self.orig_map.shape[1] * 3, QImage.Format_RGB888)
+        self.orig_pix = QPixmap(image)
+        self.edit_pix = QPixmap(image)
+
+        self.main_image = EditableMap(self)
+        self.main_image.img = self.orig_pix
+        self.main_image.setPixmap(self.orig_pix)
+
         self.main_image.setAlignment(Qt.AlignCenter)
         h, w, c = self.floorMap.map.shape
         self.main_image.setFixedSize(w, h)
+
+        self.highlightSelectedRoom()
+        self.semMapID = len(self.floorMap.classes) + 1
+        self.drawObjects(self.semMapID)
 
         # refresh map from unsaved stuff
         refresh_map_btn = QPushButton("Refresh")
@@ -181,6 +211,17 @@ class Example(QWidget):
             sem_label_box.addWidget(r)
             r.toggled.connect(self.radio_clicked)
 
+        r=QRadioButton("All")
+        sem_label_group.addButton(r)
+        sem_label_box.addWidget(r)
+        r.toggled.connect(self.radio_clicked)
+
+        r=QRadioButton("None")
+        sem_label_group.addButton(r)
+        sem_label_box.addWidget(r)
+        r.toggled.connect(self.radio_clicked)
+        r.toggle()
+
        
         grid = QGridLayout()
         grid.setSpacing(10)
@@ -205,11 +246,51 @@ class Example(QWidget):
         self.setLayout(grid)
 
         self.show()
-   
+
+
+    def highlightSelectedRoom(self):
+        ind = np.where(self.floorMap.roomSeg == self.currentRoom + 1)
+        highlight = self.orig_map.copy()
+        highlight[ind] = [120, 120, 120]
+        self.highlight_map = highlight
+
+        image = QImage(highlight, highlight.shape[1], highlight.shape[0], highlight.shape[1] * 3, QImage.Format_RGB888)
+        self.edit_pix = QPixmap(image)
+        self.main_image.img = self.edit_pix
+        self.main_image.setPixmap(self.edit_pix)
+
+    def drawObjects(self, semLabel):
+
+        clr = cm.rainbow(np.linspace(0, 1, len(self.floorMap.classes)))
+        self.drawn_map = self.highlight_map.copy()
+        noDrawInd = len(self.floorMap.classes) + 1
+        allDrawInd = len(self.floorMap.classes)
+        if semLabel != noDrawInd:
+            for room in self.floorMap.rooms:
+                for obj in room.objects:
+                    if (obj.semLabel == semLabel) or (semLabel == allDrawInd):
+                        color = 255 * clr[obj.semLabel, :3]
+                        x1, y1, x2, y2 = obj.position
+                        cv2.rectangle(self.drawn_map, (x1, y1), (x2, y2), color, 1)
+
+        image = QImage(self.drawn_map, self.drawn_map.shape[1], self.drawn_map.shape[0], self.drawn_map.shape[1] * 3, QImage.Format_RGB888)
+        self.edit_pix = QPixmap(image)
+        self.main_image.img = self.edit_pix
+        self.main_image.setPixmap(self.edit_pix)
+
+
     def refreshmap(self):
 
-        self.main_image.setPixmap(QPixmap(self.map_name))
-        self.main_image.img = QPixmap(self.map_name)
+       # self.main_image.setPixmap(QPixmap(self.map_name))
+       # self.main_image.img = QPixmap(self.map_name)
+
+        image = QImage(self.orig_map, self.orig_map.shape[1], self.orig_map.shape[0], self.orig_map.shape[1] * 3, QImage.Format_RGB888)
+        self.orig_pix = QPixmap(image)
+
+        self.main_image.img = self.orig_pix
+        self.main_image.setPixmap(self.orig_pix)
+        self.highlightSelectedRoom()
+        self.drawObjects(self.semMapID)
 
     def setRoomName(self):
 
@@ -235,9 +316,11 @@ class Example(QWidget):
             obj = self.floorMap.rooms[self.currentRoom].objects[self.currentObjInd]
             self.cb2.setCurrentIndex(obj.semLabel)
 
+        self.highlightSelectedRoom()
+        self.drawObjects(self.semMapID)
+
     def semclassselectionchange(self, i):
 
-        print("Current sem label {} selection changed".format(i))
         self.currentObjLabel = i
         self.floorMap.rooms[self.currentRoom].objects[self.currentObjInd].semLabel = self.currentObjLabel
 
@@ -275,7 +358,9 @@ class Example(QWidget):
             self.cb.clear()
             self.cb2.setCurrentIndex(0)
 
-
+        self.highlightSelectedRoom()
+        self.semMapID = len(self.floorMap.classes) + 1
+        self.drawObjects(self.semMapID)
 
 
     def addobject(self):
@@ -322,9 +407,18 @@ class Example(QWidget):
     def radio_clicked(self, value):
 
         rbtn = self.sender()
+        text = rbtn.text()
 
         if rbtn.isChecked() == True:
-            self.semMapID = self.floorMap.classes.index(rbtn.text())
+            try:
+                self.semMapID = self.floorMap.classes.index(text)
+            except:
+                if text == "All":
+                    self.semMapID = len(self.floorMap.classes)
+                elif text == "None":
+                    self.semMapID = len(self.floorMap.classes) + 1
+
+            self.drawObjects(self.semMapID)
 
 
     def object_clicked(self, item):
