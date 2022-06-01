@@ -74,15 +74,14 @@ def extractObject(roomSeg, roomID, objectMap):
 		pos = [pnts[0][0], pnts[0][1], pnts[2][0], pnts[2][1]]
 		uvs = [[pnts[0][0], pnts[0][1]], [pnts[2][0], pnts[2][1]]]
 
-		updateObj = True
+		updateObj = False
 		for uv in uvs:
 			val = roomSeg[uv[1], uv[0]]
-			if val != roomID + 1:
-				updateObj = False
+			if val == roomID + 1:
+				updateObj = True
 
 		if updateObj:
 			objects.append(pos)
-			print(pos)
 
 
 	return objects	
