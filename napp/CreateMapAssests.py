@@ -106,28 +106,29 @@ def createConfig(folderPath, yaml_data, roomsegName, roomnum, classes):
 	      "id": i,
 	      "objects": []
 		}
-		roomCfgs.append(roomCfg)
 		room = Room(roomCfg)
 		rooms.append(room)
+		roomCfgs.append(roomCfg)
 
 	if os.path.isdir(folderPath + "SemMaps/"):
+		roomCfgs.clear()
 		for c in classes:
 			semMap = cv2.imread(folderPath + "SemMaps/" + c + ".png", 0)
 			semMaps.append(semMap)
 
-		for roomID in range(roomnum):
+		for i in range(roomnum):
 			room = rooms[i]
 			objects = []
 
 			for s in range(len(semMaps)):
-				objects_bw = extractObject(roomSeg, roomID, semMaps[s])
+				objects_bw = extractObject(roomSeg, i, semMaps[s])
 				for o in objects_bw:
 					room.AddObject(s, o)
 
 
 			roomCfg = room.Dump()
 			#print(roomCfg)
-			roomCfgs[roomID] = roomCfg
+			roomCfgs.append(roomCfg)
 		
 
 	floorCfg = {

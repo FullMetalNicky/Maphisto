@@ -21,9 +21,9 @@ class Room():
 
 	def CreateObject(self, semLabel=0, position=[0, 0, 0, 0]):
 
-		oid = random.randint(0, 200)
+		oid = random.randint(0, 10000)
 		while oid in self.ids:
-			oid = random.randint(0, 200)
+			oid = random.randint(0, 10000)
 
 		objCfg = {
 		  "semLabel": semLabel,
@@ -36,9 +36,9 @@ class Room():
 
 	def AddObject(self, semLabel=0, position=[0, 0, 0, 0]):
 
-		oid = random.randint(0, 200)
+		oid = random.randint(0, 10000)
 		while oid in self.ids:
-			oid = random.randint(0, 200)
+			oid = random.randint(0, 10000)
 
 		objCfg = {
 		  "semLabel": semLabel,

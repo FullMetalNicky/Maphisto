@@ -72,7 +72,7 @@ class Example(QWidget):
 
     def __init__(self,parent):
         super(Example, self).__init__()
-        self.map_name="/home/nickybones/Code/Maphisto/nmap/data/SMap.png"
+        self.map_name="/home/nickybones/Code/Maphisto/data/JMap/JMap.png"
         self.data_folder = os.path.split(os.path.abspath(self.map_name))[0] + "/"
         self.floorMap = FloorMap(self.data_folder + "floor.config")
         self.mode = 5
@@ -266,12 +266,12 @@ class Example(QWidget):
         noDrawInd = len(self.floorMap.classes) + 1
         allDrawInd = len(self.floorMap.classes)
         if semLabel != noDrawInd:
-            for room in self.floorMap.rooms:
+            for roomID, room in enumerate(self.floorMap.rooms):
                 for obj in room.objects:
                     if (obj.semLabel == semLabel) or (semLabel == allDrawInd):
                         color = 255 * clr[obj.semLabel, :3]
                         x1, y1, x2, y2 = obj.position
-                        if objId == obj.id:
+                        if (objId == obj.id) and (roomID == self.currentRoom):
                             cv2.rectangle(self.drawn_map, (x1, y1), (x2, y2), color, -1)
                         else:
                             cv2.rectangle(self.drawn_map, (x1, y1), (x2, y2), color, 1)
