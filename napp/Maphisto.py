@@ -320,8 +320,8 @@ class Example(QWidget):
         self.drawObjects(self.semMapID, objID)
 
     def setRoomName(self):
-
-        self.floorMap.rooms[self.currentRoom].name = self.room_name_edit.text()
+        roomName = self.room_name_edit.text()
+        self.floorMap.rooms[self.currentRoom].name = roomName
 
     def setRoomPurpose(self):
 
