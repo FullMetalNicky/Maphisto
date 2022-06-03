@@ -88,7 +88,7 @@ def extractObject(roomSeg, roomID, objectMap):
 
 
 
-def createConfig(folderPath, yaml_data, roomsegName, roomnum, classes):
+def createConfig(folderPath, yaml_data, roomsegName, roomnum, classes, categories):
 
 	imageName = yaml_data['image']
 	roomSeg = cv2.imread(folderPath + roomsegName, 0)
@@ -102,7 +102,7 @@ def createConfig(folderPath, yaml_data, roomsegName, roomnum, classes):
 	for i in range(roomnum):
 		roomCfg = {
 		  "name": str(i),
-	      "purpose": "office",
+	      "purpose": 0,
 	      "id": i,
 	      "objects": []
 		}
@@ -145,7 +145,8 @@ def createConfig(folderPath, yaml_data, roomsegName, roomnum, classes):
 		    "free_thresh": 0.196
 		  },
 		"semantic": {
-		     "classes": classes
+		     "classes": classes,
+		     "categories" : categories
 		  },
 		  "rooms": roomCfgs
 	}
@@ -160,6 +161,7 @@ def main():
 	roomnum = 19
 	roomsegName = "roomseg.png"
 	classes = ['sink', 'door', 'oven', 'whiteboard', 'table', 'cardboard', 'plant', 'drawers', 'sofa', 'storage', 'chair', 'extinguisher', 'people', 'desk']
+	categories = ["office", "corridor", "kitchen", "reception"]
 
 	with open(yamlPath, "r") as stream:
 	    try:
@@ -171,7 +173,7 @@ def main():
 
 	img = cv2.imread(folderPath + yaml_data['image'])
 	#SegmentRoom(img, folderPath, roomsegName, roomnum)
-	createConfig(folderPath, yaml_data, roomsegName, roomnum, classes)
+	createConfig(folderPath, yaml_data, roomsegName, roomnum, classes, categories)
 
 
 if __name__ == '__main__':

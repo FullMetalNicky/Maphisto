@@ -15,6 +15,7 @@ class FloorMap():
 		self.roomSeg = cv2.imread(self.data_folder + config['roomSeg'], 0)
 		self.map = cv2.imread(self.data_folder + config['map']['image'])
 		self.classes = config['semantic']['classes']
+		self.categories = config['semantic']['categories']
 		self.rooms = []
 
 		if 'rooms' in config:

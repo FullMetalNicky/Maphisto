@@ -144,15 +144,32 @@ class Example(QWidget):
        
 
         # room purpose
-        btn_set_purpose = QPushButton("Purpose")
-        btn_set_purpose.clicked.connect(self.setRoomPurpose)
-        room_purpose_label = QLabel('Purpose')
-        self.room_purpose_edit = QLineEdit()
-        self.room_purpose_edit.setText(self.floorMap.rooms[self.currentRoom].purpose)
-        box_room_purpose = QHBoxLayout()
-        box_room_purpose.addWidget(room_purpose_label)
-        box_room_purpose.addWidget(self.room_purpose_edit)
-        box_room_purpose.addWidget(btn_set_purpose)
+        # btn_set_purpose = QPushButton("Purpose")
+        # btn_set_purpose.clicked.connect(self.setRoomPurpose)
+        # room_purpose_label = QLabel('Purpose')
+        # self.room_purpose_edit = QLineEdit()
+        # self.room_purpose_edit.setText(self.floorMap.rooms[self.currentRoom].purpose)
+        # box_room_purpose = QHBoxLayout()
+        # box_room_purpose.addWidget(room_purpose_label)
+        # box_room_purpose.addWidget(self.room_purpose_edit)
+        # box_room_purpose.addWidget(btn_set_purpose)
+
+
+        # room selection combobox
+        room_category_selection = QHBoxLayout()
+        room_category_label = QLabel('Rooms', self)
+        self.cb_cat = QComboBox()
+        for cat in self.floorMap.categories:
+            self.cb_cat.addItem(cat)
+        
+        self.cb_cat.currentIndexChanged.connect(self.roomcategoryselectionchange)
+        room_category_selection.addWidget(room_category_label)
+        room_category_selection.addWidget(self.cb_cat)
+        catID = self.floorMap.rooms[self.currentRoom].purpose
+        self.cb_cat.setCurrentIndex(catID)
+
+
+
 
         # object list
         self.list_objects = QListWidget()
@@ -229,7 +246,8 @@ class Example(QWidget):
         grid.addWidget(btn_browse, 1 , 0, 1, 2)
         grid.addLayout(room_selection, 2, 0, 1, 2)
         grid.addLayout(box_room_name, 3, 0, 1, 2)
-        grid.addLayout(box_room_purpose, 4, 0, 1, 2)
+        #grid.addLayout(box_room_purpose, 4, 0, 1, 2)
+        grid.addLayout(room_category_selection, 4, 0, 1, 2)
         grid.addWidget(self.list_objects, 5, 0, 4, 1)
         grid.addWidget(add_obj_btn , 5, 1, 1, 1)
         grid.addWidget(remove_obj_btn , 6, 1, 1, 1)
@@ -309,11 +327,19 @@ class Example(QWidget):
 
         self.floorMap.rooms[self.currentRoom].purpose = self.room_purpose_edit.text()
 
+
+    def roomcategoryselectionchange(self, i):
+        self.floorMap.rooms[self.currentRoom].purpose = i
+
     def roomselectionchange(self, i):
      
         self.currentRoom = i
         self.room_name_edit.setText(self.floorMap.rooms[self.currentRoom].name)
-        self.room_purpose_edit.setText(self.floorMap.rooms[self.currentRoom].purpose)
+        #self.room_purpose_edit.setText(self.floorMap.rooms[self.currentRoom].purpose)
+
+        catID = self.floorMap.rooms[self.currentRoom].purpose
+        self.cb_cat.setCurrentIndex(catID)
+
         self.list_objects.clear()
         for o in range(len(self.floorMap.rooms[self.currentRoom].objects)):
             obj = self.floorMap.rooms[self.currentRoom].objects[o]
@@ -360,7 +386,10 @@ class Example(QWidget):
         if len(self.floorMap.rooms):
             self.currentRoom = 0
             self.room_name_edit.setText(self.floorMap.rooms[self.currentRoom].name)
-            self.room_purpose_edit.setText(self.floorMap.rooms[self.currentRoom].purpose)
+            #self.room_purpose_edit.setText(self.floorMap.rooms[self.currentRoom].purpose)
+            catID = self.floorMap.rooms[self.currentRoom].purpose
+            self.cb_cat.setCurrentIndex(catID)
+            
             self.cb.clear()
             for r in range(len(self.floorMap.rooms)):
                 self.cb.addItem(str(r))
