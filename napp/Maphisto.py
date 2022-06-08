@@ -224,23 +224,26 @@ class Example(QWidget):
         # sem label radio
         sem_label_box = QVBoxLayout()
         sem_label_group = QButtonGroup()  # Number group
+        self.sem_index = []
 
         for i in range(len(self.floorMap.classes)):
-            r = QRadioButton(self.floorMap.classes[i])
-            sem_label_group.addButton(r)
-            sem_label_box.addWidget(r)
-            r.toggled.connect(self.radio_clicked)
+            self.sem_index.insert(i, QCheckBox(self.floorMap.classes[i]))
+            sem_label_group.addButton(self.sem_index[i])
+            sem_label_box.addWidget(self.sem_index[i])
+            self.sem_index[i].stateChanged.connect(self.check_clicked)
 
-        r = QRadioButton("All")
-        sem_label_group.addButton(r)
-        sem_label_box.addWidget(r)
-        r.toggled.connect(self.radio_clicked)
+        all_check = QPushButton("All")
+        all_check.setText("All")
+        sem_label_group.addButton(all_check)
+        sem_label_box.addWidget(all_check)
+        all_check.clicked.connect(self.check_clicked)
 
-        r = QRadioButton("None")
-        sem_label_group.addButton(r)
-        sem_label_box.addWidget(r)
-        r.toggled.connect(self.radio_clicked)
-        r.toggle()
+        none_check = QPushButton("All")
+        none_check.setText("None")
+        sem_label_group.addButton(none_check)
+        sem_label_box.addWidget(none_check)
+        none_check.clicked.connect(self.check_clicked)
+        # r.toggle()
 
         grid = QGridLayout()
         grid.setSpacing(10)
@@ -478,6 +481,17 @@ class Example(QWidget):
         cp = QDesktopWidget().availableGeometry().center()
         qr.moveCenter(cp)
         self.move(qr.topLeft())
+
+    def check_clicked(self, value):
+
+        rbtn = self.sender()
+        text = rbtn.text()
+
+        if rbtn.isChecked() == True:
+            self.semMapID = self.floorMap.classes.index(text)
+
+            obj = self.floorMap.rooms[self.currentRoom].objects[self.currentObjInd]
+            self.drawObjects(self.semMapID, obj.id)
 
     def radio_clicked(self, value):
 
