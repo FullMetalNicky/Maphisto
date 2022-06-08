@@ -221,7 +221,7 @@ class Example(QWidget):
             self.cb2.setCurrentIndex(obj.semLabel)
             self.list_objects.setCurrentRow(self.currentObjInd)
 
-        # sem label radio
+        # sem label radio | working towards check boxes
         sem_label_box = QVBoxLayout()
         sem_label_group = QButtonGroup()  # Number group
         self.sem_index = []
@@ -232,19 +232,21 @@ class Example(QWidget):
             sem_label_box.addWidget(self.sem_index[i])
             self.sem_index[i].stateChanged.connect(self.check_clicked)
 
+        # 'All' btn
         all_check = QPushButton("All")
         all_check.setText("All")
         sem_label_group.addButton(all_check)
         sem_label_box.addWidget(all_check)
         all_check.clicked.connect(self.check_clicked)
 
+        # 'None' btn
         none_check = QPushButton("All")
         none_check.setText("None")
         sem_label_group.addButton(none_check)
         sem_label_box.addWidget(none_check)
         none_check.clicked.connect(self.check_clicked)
-        # r.toggle()
 
+        # Layout #TODO
         grid = QGridLayout()
         grid.setSpacing(10)
 
@@ -482,6 +484,7 @@ class Example(QWidget):
         qr.moveCenter(cp)
         self.move(qr.topLeft())
 
+    # Runs when a checkbox is checked
     def check_clicked(self, value):
 
         rbtn = self.sender()
@@ -559,6 +562,7 @@ class Maphisto(QMainWindow):
 
 def main():
     app = QApplication(sys.argv)
+    # Stylesheet
     with open("napp\\stylesheets\\ubuntu.qss", "r") as f:
         style = f.read()
         app.setStyleSheet(style)
