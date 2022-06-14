@@ -182,7 +182,9 @@ class Example(QWidget):
         self.list_objects = QListWidget()
         for o in range(len(self.floorMap.rooms[self.currentRoom].objects)):
             obj = self.floorMap.rooms[self.currentRoom].objects[o]
-            self.list_objects.addItem(str(obj.id))
+            self.list_objects.addItem(
+                self.floorMap.classes[obj.semLabel] + " - " + str(obj.id)
+            )
         self.list_objects.setWindowTitle("Objects")
         self.list_objects.itemClicked.connect(self.object_clicked)
 
@@ -230,21 +232,23 @@ class Example(QWidget):
             self.sem_index.insert(i, QCheckBox(self.floorMap.classes[i]))
             sem_label_group.addButton(self.sem_index[i])
             sem_label_box.addWidget(self.sem_index[i])
-            self.sem_index[i].stateChanged.connect(self.check_clicked)
+            self.sem_index[i].stateChanged.connect(
+                lambda: self.check_clicked(self.sem_index[i])
+            )
 
         # 'All' btn
         all_check = QPushButton("All")
         all_check.setText("All")
         sem_label_group.addButton(all_check)
         sem_label_box.addWidget(all_check)
-        all_check.clicked.connect(self.check_clicked)
+        all_check.clicked.connect(lambda: self.check_clicked)
 
         # 'None' btn
         none_check = QPushButton("All")
         none_check.setText("None")
         sem_label_group.addButton(none_check)
         sem_label_box.addWidget(none_check)
-        none_check.clicked.connect(self.check_clicked)
+        none_check.clicked.connect(lambda: self.check_clicked)
 
         # Layout #TODO
         grid = QGridLayout()
