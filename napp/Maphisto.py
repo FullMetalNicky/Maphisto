@@ -137,7 +137,7 @@ class Example(QWidget):
         room_sel_label = QLabel("Rooms", self)
         self.cb = QComboBox()
         for r in range(len(self.floorMap.rooms)):
-            self.cb.addItem(str(r))
+            self.cb.addItem(self.floorMap.rooms[r].name + f" [{str(r)}]")
 
         self.cb.currentIndexChanged.connect(self.roomselectionchange)
         room_selection.addWidget(room_sel_label)
@@ -167,7 +167,7 @@ class Example(QWidget):
 
         # room selection combobox
         room_category_selection = QHBoxLayout()
-        room_category_label = QLabel("Rooms", self)
+        room_category_label = QLabel("Room Category", self)
         self.cb_cat = QComboBox()
         for cat in self.floorMap.categories:
             self.cb_cat.addItem(cat)
@@ -223,32 +223,28 @@ class Example(QWidget):
             self.cb2.setCurrentIndex(obj.semLabel)
             self.list_objects.setCurrentRow(self.currentObjInd)
 
-        # sem label radio | working towards check boxes
-        sem_label_box = QVBoxLayout()
-        sem_label_group = QButtonGroup()  # Number group
+        # Semantic label check boxes
+        self.sem_label_box = QVBoxLayout()
         self.sem_index = []
+        self.check_on = np.zeros(len(self.floorMap.classes))
 
+        # ----Create Checkboxes
         for i in range(len(self.floorMap.classes)):
             self.sem_index.insert(i, QCheckBox(self.floorMap.classes[i]))
-            sem_label_group.addButton(self.sem_index[i])
-            sem_label_box.addWidget(self.sem_index[i])
-            self.sem_index[i].stateChanged.connect(
-                lambda: self.check_clicked(self.sem_index[i])
-            )
+            self.sem_label_box.addWidget(self.sem_index[i])
+            self.sem_index[i].stateChanged.connect(self.check_clicked)
 
         # 'All' btn
         all_check = QPushButton("All")
         all_check.setText("All")
-        sem_label_group.addButton(all_check)
-        sem_label_box.addWidget(all_check)
-        all_check.clicked.connect(lambda: self.check_clicked)
+        self.sem_label_box.addWidget(all_check)
+        all_check.clicked.connect(self.btn_clicked)
 
         # 'None' btn
-        none_check = QPushButton("All")
+        none_check = QPushButton("None")
         none_check.setText("None")
-        sem_label_group.addButton(none_check)
-        sem_label_box.addWidget(none_check)
-        none_check.clicked.connect(lambda: self.check_clicked)
+        self.sem_label_box.addWidget(none_check)
+        none_check.clicked.connect(self.check_clicked)
 
         # Layout #TODO
         grid = QGridLayout()
@@ -270,7 +266,7 @@ class Example(QWidget):
         grid.addWidget(self.main_image, 2, 2, 5, 1)
         grid.addWidget(refresh_map_btn, 7, 2, 1, 1)
 
-        grid.addLayout(sem_label_box, 2, 3, 7, 1)
+        grid.addLayout(self.sem_label_box, 2, 3, 7, 1)
         self.setLayout(grid)
 
         self.show()
@@ -293,21 +289,24 @@ class Example(QWidget):
         self.main_image.setPixmap(self.edit_pix)
 
     def drawObjects(self, semLabel, objId=-1):
-
         clr = cm.rainbow(np.linspace(0, 1, len(self.floorMap.classes)))
         self.drawn_map = self.highlight_map.copy()
         noDrawInd = len(self.floorMap.classes) + 1
-        allDrawInd = len(self.floorMap.classes)
+
         if semLabel != noDrawInd:
             for roomID, room in enumerate(self.floorMap.rooms):
+                on_array = np.where(self.check_on == 1)
                 for obj in room.objects:
-                    if (obj.semLabel == semLabel) or (semLabel == allDrawInd):
+                    if obj.semLabel in on_array[0]:
                         color = 255 * clr[obj.semLabel, :3]
                         x1, y1, x2, y2 = obj.position
                         if (objId == obj.id) and (roomID == self.currentRoom):
                             cv2.rectangle(self.drawn_map, (x1, y1), (x2, y2), color, -1)
                         else:
                             cv2.rectangle(self.drawn_map, (x1, y1), (x2, y2), color, 1)
+
+        if semLabel == "All":
+            pass
 
         image = QImage(
             self.drawn_map,
@@ -474,11 +473,11 @@ class Example(QWidget):
         if self.currentObjInd != -1:
             self.main_image.edit = not self.main_image.edit
         else:
-            print("Selcet object!")
+            print("Select object!")
             self.edit_obj_btn.toggle()
 
     def saveobject(self):
-        print("saved!")
+        print("Saved!")
         self.floorMap.Dump(self.data_folder + "floor.config")
 
     def center(self):
@@ -489,33 +488,36 @@ class Example(QWidget):
         self.move(qr.topLeft())
 
     # Runs when a checkbox is checked
-    def check_clicked(self, value):
-
+    def check_clicked(self):
         rbtn = self.sender()
         text = rbtn.text()
 
-        if rbtn.isChecked() == True:
-            self.semMapID = self.floorMap.classes.index(text)
-
+        if rbtn.isChecked():
+            semMapID = self.floorMap.classes.index(text)
+            self.check_on[semMapID] = 1
             obj = self.floorMap.rooms[self.currentRoom].objects[self.currentObjInd]
-            self.drawObjects(self.semMapID, obj.id)
+            self.drawObjects(semMapID, obj.id)
 
-    def radio_clicked(self, value):
+        else:
+            semMapID = self.floorMap.classes.index(text)
+            self.check_on[semMapID] = 0
+            obj = self.floorMap.rooms[self.currentRoom].objects[self.currentObjInd]
+            self.drawObjects(semMapID, obj.id)
 
+    # Runs when a 'All' or 'None' is clicked
+    def btn_clicked(self, value):
         rbtn = self.sender()
         text = rbtn.text()
-
-        if rbtn.isChecked() == True:
-            try:
-                self.semMapID = self.floorMap.classes.index(text)
-            except:
-                if text == "All":
-                    self.semMapID = len(self.floorMap.classes)
-                elif text == "None":
-                    self.semMapID = len(self.floorMap.classes) + 1
-
-            obj = self.floorMap.rooms[self.currentRoom].objects[self.currentObjInd]
-            self.drawObjects(self.semMapID, obj.id)
+        if text == "All":
+            # Checks all semantic checkboxes
+            for i in range(len(self.floorMap.classes)):
+                self.sem_index[i].setChecked(True)
+            self.drawObjects(text)
+        else:
+            # Checks all semantic checkboxes
+            for i in range(len(self.floorMap.classes)):
+                self.sem_index[i].setChecked(True)
+            self.drawObjects(text)
 
     def object_clicked(self, item):
         # print(self.list_objects.selectedIndexes()[0].row())
@@ -523,9 +525,6 @@ class Example(QWidget):
         obj = self.floorMap.rooms[self.currentRoom].objects[self.currentObjInd]
         self.cb2.setCurrentIndex(obj.semLabel)
         self.drawObjects(self.semMapID, obj.id)
-
-    # def paintEvent( self, event) :
-    #     pass
 
 
 class Maphisto(QMainWindow):
