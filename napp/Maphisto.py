@@ -254,19 +254,18 @@ class Example(QWidget):
         grid.addLayout(room_selection, 1, 0, 1, 2)  # 'Rooms
         grid.addLayout(box_room_name, 2, 0, 1, 2)  # 'Room Name'
         # grid.addLayout(box_room_purpose, 4, 0, 1, 2)
-        grid.addLayout(room_category_selection, 3, 0, 1, 2)  # 'Room Category'
-        grid.addWidget(self.list_objects, 4, 0, 3, 2)  # Box with objects
-        grid.addWidget(add_obj_btn, 7, 0, 1, 1)  # 'Add'
-        grid.addWidget(remove_obj_btn, 7, 1, 1, 1)  # 'Remove
-        grid.addWidget(self.edit_obj_btn, 8, 0, 1, 1)  # 'Edit'
-        grid.addWidget(save_obj_btn, 8, 1, 1, 1)  # 'Save'
-
-        grid.addLayout(sem_class_selection, 10, 0, 1, 1)  # checkboxes
+        grid.addLayout(room_category_selection, 3, 0, 1, 1)  # 'Room Category'
+        grid.addLayout(sem_class_selection, 3, 1, 1, 1)  # 'Label'
+        grid.addWidget(self.list_objects, 4, 0, 2, 2)  # Box with objects
+        grid.addWidget(add_obj_btn, 6, 0, 1, 1)  # 'Add'
+        grid.addWidget(remove_obj_btn, 6, 1, 1, 1)  # 'Remove
+        grid.addWidget(self.edit_obj_btn, 7, 0, 1, 1)  # 'Edit'
+        grid.addWidget(save_obj_btn, 7, 1, 1, 1)  # 'Save'
 
         grid.addWidget(self.main_image, 1, 2, 6, 1)  # Map
         grid.addWidget(refresh_map_btn, 7, 2, 2, 1)  # 'Refresh'
 
-        grid.addLayout(self.sem_label_box, 2, 3, 7, 1)  # 'Label'
+        grid.addLayout(self.sem_label_box, 2, 3, 7, 1)  # Checkboxes
         self.setLayout(grid)
 
         self.show()
