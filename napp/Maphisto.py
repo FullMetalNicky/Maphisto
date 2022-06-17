@@ -250,23 +250,23 @@ class Example(QWidget):
         grid = QGridLayout()
         grid.setSpacing(10)
 
-        grid.addWidget(btn_browse, 1, 0, 1, 2)
-        grid.addLayout(room_selection, 2, 0, 1, 2)
-        grid.addLayout(box_room_name, 3, 0, 1, 2)
+        grid.addWidget(btn_browse, 0, 0, 1, 2)  # 'Choose Map'
+        grid.addLayout(room_selection, 1, 0, 1, 2)  # 'Rooms
+        grid.addLayout(box_room_name, 2, 0, 1, 2)  # 'Room Name'
         # grid.addLayout(box_room_purpose, 4, 0, 1, 2)
-        grid.addLayout(room_category_selection, 4, 0, 1, 2)
-        grid.addWidget(self.list_objects, 5, 0, 4, 1)
-        grid.addWidget(add_obj_btn, 5, 1, 1, 1)
-        grid.addWidget(remove_obj_btn, 6, 1, 1, 1)
-        grid.addWidget(self.edit_obj_btn, 7, 1, 1, 1)
-        grid.addWidget(save_obj_btn, 8, 1, 1, 1)
+        grid.addLayout(room_category_selection, 3, 0, 1, 2)  # 'Room Category'
+        grid.addWidget(self.list_objects, 4, 0, 3, 2)  # Box with objects
+        grid.addWidget(add_obj_btn, 7, 0, 1, 1)  # 'Add'
+        grid.addWidget(remove_obj_btn, 7, 1, 1, 1)  # 'Remove
+        grid.addWidget(self.edit_obj_btn, 8, 0, 1, 1)  # 'Edit'
+        grid.addWidget(save_obj_btn, 8, 1, 1, 1)  # 'Save'
 
-        grid.addLayout(sem_class_selection, 10, 0, 1, 2)
+        grid.addLayout(sem_class_selection, 10, 0, 1, 1)  # checkboxes
 
-        grid.addWidget(self.main_image, 2, 2, 5, 1)
-        grid.addWidget(refresh_map_btn, 7, 2, 1, 1)
+        grid.addWidget(self.main_image, 1, 2, 6, 1)  # Map
+        grid.addWidget(refresh_map_btn, 7, 2, 2, 1)  # 'Refresh'
 
-        grid.addLayout(self.sem_label_box, 2, 3, 7, 1)
+        grid.addLayout(self.sem_label_box, 2, 3, 7, 1)  # 'Label'
         self.setLayout(grid)
 
         self.show()
@@ -514,7 +514,7 @@ class Example(QWidget):
                 self.sem_index[i].setChecked(True)
             self.drawObjects(text)
         else:
-            # Checks all semantic checkboxes
+            # Unchecks all semantic checkboxes
             for i in range(len(self.floorMap.classes)):
                 self.sem_index[i].setChecked(False)
             self.drawObjects(text)
