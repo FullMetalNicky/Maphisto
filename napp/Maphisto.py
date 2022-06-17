@@ -244,7 +244,7 @@ class Example(QWidget):
         none_check = QPushButton("None")
         none_check.setText("None")
         self.sem_label_box.addWidget(none_check)
-        none_check.clicked.connect(self.check_clicked)
+        none_check.clicked.connect(self.btn_clicked)
 
         # Layout #TODO
         grid = QGridLayout()
@@ -516,7 +516,7 @@ class Example(QWidget):
         else:
             # Checks all semantic checkboxes
             for i in range(len(self.floorMap.classes)):
-                self.sem_index[i].setChecked(True)
+                self.sem_index[i].setChecked(False)
             self.drawObjects(text)
 
     def object_clicked(self, item):
