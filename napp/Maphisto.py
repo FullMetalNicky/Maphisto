@@ -7,6 +7,7 @@ from SObject import SObject
 import numpy as np
 import cv2
 from matplotlib import cm
+from pathlib import Path
 
 
 class EditableMap(QLabel):
@@ -548,7 +549,7 @@ class Maphisto(QMainWindow):
 
         # self.statusBar().showMessage('Ready')
         self.setWindowTitle("Maphisto")
-        self.setWindowIcon(QIcon("data\icons\icon.png"))
+        self.setWindowIcon(QIcon(str(Path("data/icons/icon.png"))))
 
     def closeEvent(self, event):
 
@@ -565,7 +566,7 @@ class Maphisto(QMainWindow):
 def main():
     app = QApplication(sys.argv)
     # Stylesheet
-    with open("napp\\stylesheets\\ubuntu.qss", "r") as f:
+    with open(Path("napp/stylesheets/ubuntu.qss"), "r",) as f:
         style = f.read()
         app.setStyleSheet(style)
     # ex = Example()
