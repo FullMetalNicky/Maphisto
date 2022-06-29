@@ -155,17 +155,6 @@ class Example(QWidget):
         box_room_name.addWidget(self.room_name_edit)
         box_room_name.addWidget(btn_set_room_name)
 
-        # room purpose
-        # btn_set_purpose = QPushButton("Purpose")
-        # btn_set_purpose.clicked.connect(self.setRoomPurpose)
-        # room_purpose_label = QLabel('Purpose')
-        # self.room_purpose_edit = QLineEdit()
-        # self.room_purpose_edit.setText(self.floorMap.rooms[self.currentRoom].purpose)
-        # box_room_purpose = QHBoxLayout()
-        # box_room_purpose.addWidget(room_purpose_label)
-        # box_room_purpose.addWidget(self.room_purpose_edit)
-        # box_room_purpose.addWidget(btn_set_purpose)
-
         # room selection combobox
         room_category_selection = QHBoxLayout()
         room_category_label = QLabel("Room Category", self)
@@ -367,7 +356,9 @@ class Example(QWidget):
         self.list_objects.clear()
         for o in range(len(self.floorMap.rooms[self.currentRoom].objects)):
             obj = self.floorMap.rooms[self.currentRoom].objects[o]
-            self.list_objects.addItem(str(obj.id))
+            self.list_objects.addItem(
+                self.floorMap.classes[obj.semLabel] + " - " + str(obj.id)
+            )
 
         objID = -1
         if len(self.floorMap.rooms[self.currentRoom].objects):
@@ -427,7 +418,9 @@ class Example(QWidget):
             self.list_objects.clear()
             for o in range(len(self.floorMap.rooms[self.currentRoom].objects)):
                 obj = self.floorMap.rooms[self.currentRoom].objects[o]
-                self.list_objects.addItem(str(obj.id))
+                self.list_objects.addItem(
+                    self.floorMap.classes[obj.semLabel] + " - " + str(obj.id)
+                )
 
             if len(self.floorMap.rooms[self.currentRoom].objects):
                 self.currentObjInd = 0
@@ -453,7 +446,9 @@ class Example(QWidget):
         # objs = self.floorMap.rooms[self.currentRoom].objects
         self.currentObjInd = len(objs) - 1
         obj = objs[self.currentObjInd]
-        self.list_objects.addItem(str(obj.id))
+        self.list_objects.addItem(
+            self.floorMap.classes[obj.semLabel] + " - " + str(obj.id)
+        )
         self.cb2.setCurrentIndex(obj.semLabel)
         self.list_objects.setCurrentRow(self.currentObjInd)
 
