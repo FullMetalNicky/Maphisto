@@ -174,6 +174,7 @@ class Example(QWidget):
 
         # object list
         self.list_objects = QListWidget()
+        self.list_objects.setAlternatingRowColors(True)
         for o in range(len(self.floorMap.rooms[self.currentRoom].objects)):
             obj = self.floorMap.rooms[self.currentRoom].objects[o]
             self.list_objects.addItem(
@@ -556,6 +557,7 @@ class Example(QWidget):
         self.currentObjInd = self.list_objects.selectedIndexes()[0].row()
         obj = self.floorMap.rooms[self.currentRoom].objects[self.currentObjInd]
         self.cb2.setCurrentIndex(obj.semLabel)
+        # Sets self.currentObjId to the id of the selected object
         self.currentObjId = (
             self.floorMap.rooms[self.currentRoom].objects[self.currentObjInd].id
         )
