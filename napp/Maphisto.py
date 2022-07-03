@@ -286,6 +286,7 @@ class Example(QWidget):
         self.main_image.setPixmap(self.edit_pix)
 
     def drawObjects(self, semLabel, objId=-1):
+        # Picks a colour for every semantic label
         clr = cm.rainbow(np.linspace(0, 1, len(self.floorMap.classes)))
         self.drawn_map = self.highlight_map.copy()
         noDrawInd = len(self.floorMap.classes) + 1
@@ -316,10 +317,14 @@ class Example(QWidget):
         self.main_image.img = self.edit_pix
         self.main_image.setPixmap(self.edit_pix)
 
+    # Allows selected objects to be visible of the map
+    # ---Can be combined with refresh and drawObjects in order to optimize #ToDo
     def refresh_selected_objects(self):
         self.drawn_map = self.highlight_map.copy()
 
+        # Picks a colour for every semantic label
         clr = cm.rainbow(np.linspace(0, 1, len(self.floorMap.classes)))
+
         for roomID, room in enumerate(self.floorMap.rooms):
             on_array = np.where(self.check_on == 1)
             for obj in room.objects:
@@ -327,8 +332,10 @@ class Example(QWidget):
                 if obj.semLabel in on_array[0]:
                     color = 255 * clr[obj.semLabel, :3]
                     x1, y1, x2, y2 = obj.position
+                    # Displays the selected object as a filled-in rectangle
                     if obj.id == self.currentObjId and roomID == self.currentRoom:
                         cv2.rectangle(self.drawn_map, (x1, y1), (x2, y2), color, -1)
+                    # Displays the other objects as empty rectangles
                     else:
                         cv2.rectangle(self.drawn_map, (x1, y1), (x2, y2), color, 1)
         image = QImage(
@@ -343,9 +350,6 @@ class Example(QWidget):
         self.main_image.setPixmap(self.edit_pix)
 
     def refreshmap(self):
-
-        # self.main_image.setPixmap(QPixmap(self.map_name))
-        # self.main_image.img = QPixmap(self.map_name)
 
         image = QImage(
             self.orig_map,
