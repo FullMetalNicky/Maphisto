@@ -100,6 +100,7 @@ class Example(QWidget):
         self.semMapID = 0
         self.currentRoom = 0
         self.currentObjLabel = 0
+        self.currentObjId = -1
         self.currentObjInd = -1
         self.check_on = np.zeros(len(self.floorMap.classes))
 
@@ -321,10 +322,11 @@ class Example(QWidget):
         for roomID, room in enumerate(self.floorMap.rooms):
             on_array = np.where(self.check_on == 1)
             for obj in room.objects:
+
                 if obj.semLabel in on_array[0]:
                     color = 255 * clr[obj.semLabel, :3]
                     x1, y1, x2, y2 = obj.position
-                    if roomID == self.currentRoom:
+                    if obj.id == self.currentObjId and roomID == self.currentRoom:
                         cv2.rectangle(self.drawn_map, (x1, y1), (x2, y2), color, -1)
                     else:
                         cv2.rectangle(self.drawn_map, (x1, y1), (x2, y2), color, 1)
@@ -404,7 +406,6 @@ class Example(QWidget):
         self.refresh_selected_objects()
 
     def semclassselectionchange(self, i):
-
         self.currentObjLabel = i
         self.floorMap.rooms[self.currentRoom].objects[
             self.currentObjInd
@@ -555,6 +556,9 @@ class Example(QWidget):
         self.currentObjInd = self.list_objects.selectedIndexes()[0].row()
         obj = self.floorMap.rooms[self.currentRoom].objects[self.currentObjInd]
         self.cb2.setCurrentIndex(obj.semLabel)
+        self.currentObjId = (
+            self.floorMap.rooms[self.currentRoom].objects[self.currentObjInd].id
+        )
         self.drawObjects(self.semMapID, obj.id)
         self.refresh_selected_objects()
 
