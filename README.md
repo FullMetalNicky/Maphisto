@@ -1,5 +1,8 @@
-# MAPhisto - an Editor for Abstract Semantic Maps
+# MAPhisto - An Editor for Abstract Semantic Maps
 User friendly editor for semantics enchanced robot localization.
+
+![MAPhisto](resources/Maphisto.png)
+
 
 ## Installation
 
