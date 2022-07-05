@@ -92,7 +92,6 @@ class Example(QWidget):
     def initUI(self):
 
         QToolTip.setFont(QFont("SansSerif", 10))
-        # QMainWindow.statusBar().showMessage('Ready')
         self.setGeometry(300, 300, 250, 150)
         self.resize(1500, 480)
         self.center()
@@ -303,8 +302,6 @@ class Example(QWidget):
                         else:
                             cv2.rectangle(self.drawn_map, (x1, y1), (x2, y2), color, 1)
 
-        if semLabel == "All":
-            pass
 
         image = QImage(
             self.drawn_map,
@@ -370,11 +367,12 @@ class Example(QWidget):
 
         self.highlightSelectedRoom()
         self.drawObjects(self.semMapID, objID)
-        self.refresh_selected_objects()
+        #self.refresh_selected_objects()
 
     def setRoomName(self):
         roomName = self.room_name_edit.text()
         self.floorMap.rooms[self.currentRoom].name = roomName
+        self.cb.setItemText(self.currentRoom, roomName + f" [{str(self.currentRoom)}]")
 
     def setRoomPurpose(self):
 
@@ -405,16 +403,18 @@ class Example(QWidget):
             obj = self.floorMap.rooms[self.currentRoom].objects[self.currentObjInd]
             self.cb2.setCurrentIndex(obj.semLabel)
             objID = obj.id
+          
 
         self.highlightSelectedRoom()
         self.drawObjects(self.semMapID, objID)
-        self.refresh_selected_objects()
+        #self.refresh_selected_objects()
 
     def semclassselectionchange(self, i):
         self.currentObjLabel = i
-        self.floorMap.rooms[self.currentRoom].objects[
-            self.currentObjInd
-        ].semLabel = self.currentObjLabel
+        self.floorMap.rooms[self.currentRoom].objects[self.currentObjInd].semLabel = self.currentObjLabel
+        obj = self.floorMap.rooms[self.currentRoom].objects[self.currentObjInd]
+        item = self.list_objects.selectedItems()[0]
+        item.setText(self.floorMap.classes[obj.semLabel] + " - " + str(obj.id))
 
     def browse(self):
         w = QWidget()
@@ -531,14 +531,15 @@ class Example(QWidget):
             self.check_on[semMapID] = 1
             obj = self.floorMap.rooms[self.currentRoom].objects[self.currentObjInd]
             self.drawObjects(semMapID, obj.id)
-            self.refresh_selected_objects()
+            #self.refresh_selected_objects()
+            self.semMapID = len(self.floorMap.classes) 
 
         else:
             semMapID = self.floorMap.classes.index(text)
             self.check_on[semMapID] = 0
             obj = self.floorMap.rooms[self.currentRoom].objects[self.currentObjInd]
             self.drawObjects(semMapID, obj.id)
-            self.refresh_selected_objects()
+            #self.refresh_selected_objects()
 
     # Runs when a 'All' or 'None' is clicked
     def btn_clicked(self, value):
@@ -549,13 +550,17 @@ class Example(QWidget):
             self.check_buttons = 1
             for i in range(len(self.floorMap.classes)):
                 self.sem_index[i].setChecked(True)
-            self.refresh_selected_objects()
+            #self.refresh_selected_objects()
+            self.semMapID = len(self.floorMap.classes)
+            obj = self.floorMap.rooms[self.currentRoom].objects[self.currentObjInd]
+            self.drawObjects(self.semMapID, obj.id)
         else:
             # Unchecks all semantic checkboxes
             self.check_buttons = 0
             for i in range(len(self.floorMap.classes)):
                 self.sem_index[i].setChecked(False)
-            self.refresh_selected_objects()
+            #self.refresh_selected_objects()
+            self.semMapID = len(self.floorMap.classes) + 1
 
     def object_clicked(self, item):
         self.currentObjInd = self.list_objects.selectedIndexes()[0].row()
