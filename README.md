@@ -1,24 +1,23 @@
-# Maphisto
-Floor Maps for Robot Localization
+# MAPhisto - An Editor for Abstract Semantic Maps
+User friendly editor for semantics enchanced robot localization.
 
+
+![MAPhisto](resources/Maphisto.png)
+
+Created by Nicky Zimmerman and [Lior Rozin](https://github.com/Zayatsoff).
 ## Installation
 
 Required dependencies
 ```bash
-sudo apt-get install nlohmann-json3-dev
-sudo apt-get install libgtest-dev
-sudo apt install libeigen3-dev
+pip install numpy matplotlib opencv-python 
 ```
-OpenCV 4 is also required. To save you some pain, please follow to OpenCV installation instructions in this [link](https://docs.opencv.org/4.x/d7/d9f/tutorial_linux_install.html). You'll need Boost but this should come with Ubuntu. 
-To compile the code, run 
+
+## Usage
+
+To use the editor, run 
 ```bash
-cd nmap
-mkdir build
-cd build
-cmake .. -DBUILD_TESTING=1  
-make
+python napp/Maphisto.py
 ```
-To make sure everything was built correctly, in the build directory, run the unit tests
-```bash
-./bin/NMapUnitTests
-```
+[![](http://img.youtube.com/vi/8c1wVnJntAo/0.jpg)](https://www.youtube.com/watch?v=8c1wVnJntAo "MAPhisto")
+
+
