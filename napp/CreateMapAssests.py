@@ -135,15 +135,16 @@ def createConfig(folderPath, yaml_data, roomsegName, roomnum, classes, categorie
 		
 		"name": "0",
 		"roomSeg": roomsegName,
-		"map": {
+		"map": [{
 		    "type": "GMap",
 		    "image": imageName,
 		    "resolution": resolution,
 		    "origin": origin,
 		    "negate": 0,
 		    "occupied_thresh": 0.65,
-		    "free_thresh": 0.196
-		  },
+		    "free_thresh": 0.196,
+		    "augment" : 0
+		  }],
 		"semantic": {
 		     "classes": classes,
 		     "categories" : categories

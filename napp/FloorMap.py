@@ -13,7 +13,7 @@ class FloorMap():
 
 		self.data_folder = os.path.split(os.path.abspath(jsonPath))[0] + "/"
 		self.roomSeg = cv2.imread(self.data_folder + config['roomSeg'], 0)
-		self.map = cv2.imread(self.data_folder + config['map']['image'])
+		self.map = cv2.imread(self.data_folder + config['map'][0]['image'])
 		self.classes = config['semantic']['classes']
 		self.categories = config['semantic']['categories']
 		self.rooms = []
